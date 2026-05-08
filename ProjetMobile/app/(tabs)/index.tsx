@@ -1,95 +1,118 @@
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import PopcornGame from "../../components/ui/PopcornTap";
-import CandyGame from "../../components/CandyCatsher";
+import { router } from "expo-router";
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Palette } from "../../constants/palette";
 
-type ActiveScreen = "hub" | "popcorn" | "candy";
-
 export default function HomeScreen() {
-  const [active, setActive] = useState<ActiveScreen>("hub");
-
-  if (active === "popcorn") {
-    return (
-      <PopcornGame key="popcorn" onBackToWelcome={() => setActive("hub")} />
-    );
-  }
-
-  if (active === "candy") {
-    return <CandyGame key="candy" onBackToWelcome={() => setActive("hub")} />;
-  }
-
-  // Temporary hub — will be replaced with the full Games Hub screen
   return (
-    <View style={styles.hub}>
-      <Text style={styles.title}>🎮 Pick a Game</Text>
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.container}>
+        {/* ─── Title ───────────────────────────────────────────────── */}
+        <Text style={styles.title}>Our Games</Text>
 
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: "#FF6B6B" }]}
-        onPress={() => setActive("popcorn")}
-        activeOpacity={0.85}
-      >
-        <Text style={styles.cardEmoji}>🍿</Text>
-        <Text style={styles.cardTitle}>Popcorn Tap</Text>
-        <Text style={styles.cardDesc}>
-          Pop as many popcorns as you can in 30s!
-        </Text>
-      </TouchableOpacity>
+        {/* ─── Game cards row ──────────────────────────────────────── */}
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.push("/games/popcorn")}
+            activeOpacity={0.85}
+          >
+            <Image
+              source={require("../../assets/images/11.png")}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <Text style={styles.cardName}>Popcorn Tap</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: "#A855F7" }]}
-        onPress={() => setActive("candy")}
-        activeOpacity={0.85}
-      >
-        <Text style={styles.cardEmoji}>🍬</Text>
-        <Text style={styles.cardTitle}>Candy Catcher</Text>
-        <Text style={styles.cardDesc}>
-          Catch falling candies with your basket!
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.push("/games/candy")}
+            activeOpacity={0.85}
+          >
+            <Image
+              source={require("../../assets/images/1.png")}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <Text style={styles.cardName}>Candy Catcher</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* ─── Coming soon ─────────────────────────────────────────── */}
+        <View style={styles.comingSoon}>
+          <Text style={styles.comingSoonText}>More Games to come Soon</Text>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
+const CARD_SIZE = 150;
+
 const styles = StyleSheet.create({
-  hub: {
+  safe: {
     flex: 1,
     backgroundColor: Palette.background,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-    gap: 20,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingTop: 32,
+    gap: 28,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "900",
-    color: Palette.textPrimary,
-    marginBottom: 12,
+    fontSize: 26,
+    fontWeight: "800",
+    color: Palette.primary,
+  },
+  row: {
+    flexDirection: "row",
+    gap: 16,
   },
   card: {
-    width: "100%",
-    borderRadius: 24,
-    padding: 28,
-    alignItems: "center",
+    width: CARD_SIZE,
+    borderRadius: 12,
+    overflow: "hidden",
+    borderWidth: 1.5,
+    borderColor: Palette.border,
+    backgroundColor: Palette.card,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  cardEmoji: {
-    fontSize: 56,
-    marginBottom: 8,
+  cardImage: {
+    width: CARD_SIZE,
+    height: CARD_SIZE,
   },
-  cardTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#fff",
-    marginBottom: 6,
-  },
-  cardDesc: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.85)",
+  cardName: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: Palette.primary,
     textAlign: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  comingSoon: {
+    borderWidth: 1.5,
+    borderColor: Palette.placeholder,
+    borderStyle: "dashed",
+    borderRadius: 8,
+    paddingVertical: 28,
+    paddingHorizontal: 16,
+  },
+  comingSoonText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: Palette.textPrimary,
+    lineHeight: 26,
   },
 });

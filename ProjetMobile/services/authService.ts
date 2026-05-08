@@ -46,10 +46,60 @@ export const apiLogin = async (
   return data;
 };
 
+// ─── Refresh Token ──────────────────────────────────────────────────────────
+export const apiRefreshToken = async (
+  refreshToken: string,
+): Promise<{ accessToken: string; refreshToken: string }> => {
+  const res = await fetch(`${BASE_URL}/auth/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Token refresh failed");
+  return data;
+};
+
 // ─── Logout ───────────────────────────────────────────────────────────────────
 export const apiLogout = async (accessToken: string): Promise<void> => {
   await fetch(`${BASE_URL}/auth/logout`, {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}` },
   });
+};
+
+// ─── Update Username ──────────────────────────────────────────────────────────
+export const apiUpdateUsername = async (
+  accessToken: string,
+  username: string,
+): Promise<AuthUser> => {
+  const res = await fetch(`${BASE_URL}/auth/update-username`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ username }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update username");
+  return data.user as AuthUser;
+};
+
+// ─── Update Password ──────────────────────────────────────────────────────────
+export const apiUpdatePassword = async (
+  accessToken: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> => {
+  const res = await fetch(`${BASE_URL}/auth/update-password`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update password");
 };

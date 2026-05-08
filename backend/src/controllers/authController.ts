@@ -187,3 +187,93 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// ─── UPDATE USERNAME ──────────────────────────────────────────────────────────
+// PUT /api/auth/update-username
+export const updateUsername = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const { username } = req.body;
+
+  if (!username || typeof username !== "string" || username.trim().length < 3) {
+    res
+      .status(400)
+      .json({ message: "Username must be at least 3 characters long" });
+    return;
+  }
+
+  try {
+    const taken = await User.findOne({
+      username: username.trim(),
+      _id: { $ne: req.userId },
+    });
+    if (taken) {
+      res.status(409).json({ message: "This username is already taken" });
+      return;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { username: username.trim() },
+      { new: true },
+    ).select("-password -refreshToken");
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res
+      .status(200)
+      .json({
+        message: "Username updated",
+        user: { id: user._id, username: user.username, email: user.email },
+      });
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ─── UPDATE PASSWORD ──────────────────────────────────────────────────────────
+// PUT /api/auth/update-password
+export const updatePassword = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    res
+      .status(400)
+      .json({ message: "currentPassword and newPassword are required" });
+    return;
+  }
+  if (newPassword.length < 6) {
+    res
+      .status(400)
+      .json({ message: "New password must be at least 6 characters long" });
+    return;
+  }
+
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const valid = await user.comparePassword(currentPassword);
+    if (!valid) {
+      res.status(401).json({ message: "Current password is incorrect" });
+      return;
+    }
+
+    user.password = newPassword;
+    await user.save(); // pre-save hook will hash the password
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
+};

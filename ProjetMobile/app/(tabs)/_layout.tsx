@@ -1,40 +1,63 @@
 import { Tabs } from "expo-router";
 import React from "react";
-
-import { HapticTab } from "@/components/haptic-tab";
+import { StyleSheet } from "react-native";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Palette } from "@/constants/palette";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarShowLabel: false,
+        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: Palette.primary,
+        tabBarInactiveTintColor: Palette.placeholder,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <IconSymbol size={24} name="house.fill" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="leaderboard"
         options={{
-          title: "Leaderboard",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="trophy.fill" color={color} />
+            <IconSymbol size={24} name="trophy.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={24} name="person.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="options"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={24} name="gearshape.fill" color={color} />
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: Palette.white,
+    borderTopWidth: 1,
+    borderTopColor: Palette.divider,
+    height: 60,
+    paddingBottom: 8,
+    paddingTop: 8,
+  },
+});
